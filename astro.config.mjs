@@ -2,6 +2,6 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://qlinda.github.io',
-  base: '/architecture-site',
-});
+    site: 'https://qlinda.github.io',
+    base: '/askew',
+  });
