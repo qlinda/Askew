@@ -1,0 +1,453 @@
+---
+---
+
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width" />
+	<title>Mission — ASKEW</title>
+
+	<style>
+		:root {
+			--bg: #eeeeec;
+			--ink: #111111;
+			--muted: #686868;
+			--red: #ff4a2d;
+			--blue: #4c63ff;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html,
+		body {
+			margin: 0;
+			width: 100%;
+			min-height: 100%;
+			background: var(--bg);
+			color: var(--ink);
+		}
+
+		body {
+			font-family: "Courier New", Courier, monospace;
+		}
+
+		a {
+			color: inherit;
+			text-decoration: none;
+		}
+
+		.page {
+			position: relative;
+			width: 100%;
+			min-height: 100vh;
+			padding-bottom: 80px;
+		}
+
+
+		/* ========================================
+		   HEADER
+		   ======================================== */
+
+		.logo {
+			position: absolute;
+			top: 38px;
+			left: 16px;
+
+			font-size: 24px;
+			font-weight: 400;
+			line-height: 1;
+		}
+
+		.nav {
+			position: absolute;
+			top: 38px;
+			left: 50%;
+
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+
+			font-size: 24px;
+			font-weight: 400;
+			line-height: 1.2;
+		}
+
+		.nav a:hover {
+			opacity: 0.5;
+		}
+
+		.nav .active {
+			text-decoration: underline;
+			text-underline-offset: 5px;
+		}
+
+
+		/* ========================================
+		   CROSS SYMBOL
+		   ======================================== */
+
+		.cross {
+			position: absolute;
+			width: 20px;
+			height: 20px;
+			transform: translate(-10px, -10px);
+			pointer-events: none;
+		}
+
+		.cross::before,
+		.cross::after {
+			content: "";
+			position: absolute;
+			display: block;
+			background: currentColor;
+		}
+
+		.cross::before {
+			width: 20px;
+			height: 1px;
+			left: 0;
+			top: 10px;
+		}
+
+		.cross::after {
+			width: 1px;
+			height: 20px;
+			left: 10px;
+			top: 0;
+		}
+
+		.cross.red {
+			color: var(--red);
+		}
+
+		.cross.blue {
+			color: var(--blue);
+		}
+
+
+		/* ========================================
+		   LEFT REGISTRATION LINE
+		   ======================================== */
+
+		.logo-cross {
+			left: 29px;
+			top: 82px;
+		}
+
+		.left-line {
+			position: absolute;
+			left: 29px;
+			top: 82px;
+
+			width: 1px;
+			height: calc(100vh - 165px);
+
+			background: var(--ink);
+			transform: translateX(-0.5px);
+			opacity: 0.75;
+		}
+
+		.bottom-cross {
+			left: 29px;
+			bottom: 20px;
+		}
+
+
+		/* ========================================
+		   MISSION CONTENT
+		   ======================================== */
+
+		.mission {
+			position: relative;
+			padding-top: 260px;
+
+			margin-left: 14%;
+			margin-right: 9%;
+
+			max-width: 1250px;
+		}
+
+		.mission-label {
+			font-size: 12px;
+			color: var(--muted);
+			letter-spacing: 0.08em;
+
+			margin-bottom: 28px;
+		}
+
+
+		/* Main mission statement */
+
+		.intro {
+			max-width: 900px;
+
+			font-size: clamp(24px, 2.5vw, 39px);
+			line-height: 1.28;
+			letter-spacing: -0.025em;
+
+			margin: 0;
+		}
+
+
+		/* ========================================
+		   ALIGNMENT LINE BETWEEN SECTIONS
+		   ======================================== */
+
+		.divider {
+			position: relative;
+
+			width: 100%;
+			height: 1px;
+
+			background: var(--ink);
+
+			margin-top: 80px;
+			margin-bottom: 65px;
+		}
+
+		.divider-cross {
+			position: absolute;
+
+			left: 33%;
+			top: 0;
+		}
+
+
+		/* ========================================
+		   LOWER TEXT
+		   ======================================== */
+
+		.lower {
+			display: grid;
+
+			grid-template-columns:
+				1fr 1fr;
+
+			column-gap: 10%;
+
+			max-width: 1050px;
+		}
+
+		.text-block {
+			font-size: 16px;
+			line-height: 1.6;
+
+			margin: 0;
+		}
+
+		.block-number {
+			display: block;
+
+			font-size: 11px;
+			color: var(--muted);
+
+			margin-bottom: 18px;
+
+			letter-spacing: 0.08em;
+		}
+
+
+		/* ========================================
+		   SMALL QUIRK / REGISTRATION MARK
+		   ======================================== */
+
+		.side-note {
+			position: absolute;
+
+			right: 4%;
+			top: 58%;
+
+			font-size: 11px;
+			line-height: 1.5;
+
+			color: var(--muted);
+
+			writing-mode: vertical-rl;
+		}
+
+
+		/* ========================================
+		   MOBILE
+		   ======================================== */
+
+		@media (max-width: 700px) {
+
+			.logo {
+				font-size: 20px;
+			}
+
+			.nav {
+				left: auto;
+				right: 25px;
+
+				font-size: 20px;
+			}
+
+			.mission {
+				padding-top: 250px;
+
+				margin-left: 15%;
+				margin-right: 8%;
+			}
+
+			.intro {
+				font-size: 23px;
+			}
+
+			.lower {
+				grid-template-columns: 1fr;
+				gap: 45px;
+			}
+
+			.side-note {
+				display: none;
+			}
+		}
+	</style>
+</head>
+
+
+<body>
+
+	<main class="page">
+
+
+		<!-- ASKEW -->
+
+		<a href={import.meta.env.BASE_URL} class="logo">
+            ASKEW
+        </a>
+
+		<span
+			class="cross red logo-cross"
+		></span>
+
+		<div class="left-line"></div>
+
+		<span
+			class="cross blue bottom-cross"
+		></span>
+
+
+
+		<!-- NAVIGATION -->
+
+		<nav class="nav">
+
+			<a
+				href="/mission"
+				class="active"
+			>
+				MISSION
+			</a>
+
+			<a href="/projects">
+				PROJECTS
+			</a>
+
+			<a href="/about">
+				ABOUT
+			</a>
+
+			<a href="/contact">
+				CONTACT
+			</a>
+
+		</nav>
+
+
+
+		<!-- MISSION -->
+
+		<section class="mission">
+
+			<div class="mission-label">
+				01 / MISSION
+			</div>
+
+
+			<p class="intro">
+				We are a nonprofit architecture and
+				building practice focused on small,
+				highly individualized homes made from
+				local, unconventional, and environmentally
+				responsible materials.
+			</p>
+
+
+
+			<!-- drafting divider -->
+
+			<div class="divider">
+
+				<span
+					class="cross red divider-cross"
+				></span>
+
+			</div>
+
+
+
+			<div class="lower">
+
+
+				<!-- SECOND PARAGRAPH -->
+
+				<div>
+
+					<span class="block-number">
+						02
+					</span>
+
+					<p class="text-block">
+						We work across design, sourcing,
+						permitting, budgeting, and construction,
+						connecting each project to the materials,
+						craftspeople, foresters, sawmills,
+						engineers, and builders of its region.
+						We blur the conventional boundaries
+						between architect, engineer, craftsperson,
+						and client to create a more collaborative
+						and participatory way of building.
+					</p>
+
+				</div>
+
+
+
+				<!-- THIRD PARAGRAPH -->
+
+				<div>
+
+					<span class="block-number">
+						03
+					</span>
+
+					<p class="text-block">
+						Beyond individual projects, we support
+						a broader culture of hands-on construction
+						through workshops, shared knowledge, and
+						community-based making. We want alternative
+						building to feel more accessible, adaptable,
+						and rooted in place.
+					</p>
+
+				</div>
+
+
+			</div>
+
+		</section>
+
+
+		<div class="side-note">
+			LOCAL / PARTICIPATORY / ADAPTABLE
+		</div>
+
+
+	</main>
+
+</body>
+</html>

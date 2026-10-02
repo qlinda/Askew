@@ -1,32 +1,881 @@
 ---
+const base = import.meta.env.BASE_URL.endsWith("/")
+    ? import.meta.env.BASE_URL
+    : `${import.meta.env.BASE_URL}/`;
 ---
 
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<title>Architecture Practice</title>
-	</head>
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width" />
+	<title>ASKEW</title>
 
-	<body>
-		<header>
-			<a href="/">PRACTICE NAME</a>
+	<style>
+		:root {
+			--bg: #eeeeec;
+			--ink: #111111;
+			--muted: #686868;
+			--red: #ff4a2d;
+			--blue: #4c63ff;
+		}
 
-			<nav>
-				<a href="/">Mission</a>
-				<a href="/about">About</a>
-				<a href="/projects">Projects</a>
-				<a href="/contact">Contact</a>
-			</nav>
-		</header>
+		* {
+			box-sizing: border-box;
+		}
 
-		<main>
-			<h1>Mission</h1>
+		html,
+		body {
+			margin: 0;
+			width: 100%;
+			min-height: 100%;
+			background: var(--bg);
+			color: var(--ink);
+		}
 
-			<p>
-				We are an architecture practice exploring new ways of building
-				with local materials, communities, and craftspeople.
-			</p>
-		</main>
-	</body>
+		body {
+			font-family: "Courier New", Courier, monospace;
+		}
+
+		a {
+			color: inherit;
+			text-decoration: none;
+		}
+
+		.page {
+			position: relative;
+			width: 100%;
+			height: 100vh;
+			min-height: 650px;
+			overflow: hidden;
+		}
+
+
+		/* ========================================
+		   HEADER
+		======================================== */
+
+		.logo {
+			position: absolute;
+			top: 38px;
+			left: 16px;
+			font-size: 24px;
+			font-weight: 400;
+			line-height: 1;
+			z-index: 50;
+		}
+
+		.logo:hover {
+			opacity: 0.5;
+		}
+
+		.nav {
+			position: absolute;
+			top: 38px;
+			left: 50%;
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+			font-size: 24px;
+			font-weight: 400;
+			line-height: 1.2;
+			z-index: 50;
+		}
+
+		.nav a:hover {
+			opacity: 0.5;
+		}
+
+
+		/* ========================================
+		   GEOMETRIC CROSS
+		======================================== */
+
+		.cross {
+			position: absolute;
+			width: 20px;
+			height: 20px;
+			transform: translate(-10px, -10px);
+			pointer-events: none;
+			z-index: 20;
+		}
+
+		.cross::before,
+		.cross::after {
+			content: "";
+			position: absolute;
+			display: block;
+			background: currentColor;
+		}
+
+		.cross::before {
+			width: 20px;
+			height: 1px;
+			left: 0;
+			top: 10px;
+		}
+
+		.cross::after {
+			width: 1px;
+			height: 20px;
+			left: 10px;
+			top: 0;
+		}
+
+		.cross.red {
+			color: var(--red);
+		}
+
+		.cross.blue {
+			color: var(--blue);
+		}
+
+		.cross.black {
+			color: var(--ink);
+		}
+
+
+		/* ========================================
+		   LEFT REGISTRATION LINE
+		======================================== */
+
+		.logo-cross {
+			left: 29px;
+			top: 82px;
+		}
+
+		.left-line {
+			position: absolute;
+			left: 29px;
+			top: 82px;
+			width: 1px;
+			height: calc(100vh - 165px);
+			background: var(--ink);
+			transform: translateX(-0.5px);
+			opacity: 0.75;
+		}
+
+		.bottom-cross {
+			left: 29px;
+			bottom: 20px;
+		}
+
+
+		/* ========================================
+		   TIMELINE
+		======================================== */
+
+		.timeline-area {
+			position: absolute;
+			left: 6%;
+			right: 5%;
+			top: 53%;
+			height: 300px;
+		}
+
+		.timeline-track {
+			position: absolute;
+			left: 0;
+			right: 0;
+			top: 100px;
+			height: 1px;
+			background: var(--ink);
+			transform: translateY(-0.5px);
+		}
+
+		.timeline-start,
+		.timeline-end {
+			position: absolute;
+			top: 70px;
+			font-size: 14px;
+			letter-spacing: 0.04em;
+			color: var(--muted);
+			user-select: none;
+		}
+
+		.timeline-start {
+			left: 0;
+		}
+
+		.timeline-end {
+			right: 0;
+			text-align: right;
+		}
+
+		.end-cross {
+			left: 100%;
+			top: 100px;
+		}
+
+
+		/* ========================================
+		   DRAGGER
+		======================================== */
+
+		.dragger {
+			position: absolute;
+			left: 30%;
+			top: 100px;
+			width: 32px;
+			height: 350px;
+			transform: translate(-50%, -50%);
+			cursor: ew-resize;
+			touch-action: none;
+			z-index: 30;
+		}
+
+		.dragger-line {
+			position: absolute;
+			left: 50%;
+			top: 0;
+			width: 1px;
+			height: 350px;
+			background: var(--ink);
+			transform: translateX(-0.5px);
+		}
+
+		.dragger-cross {
+			left: 50%;
+			top: 50%;
+			color: var(--red);
+		}
+
+		.current-year {
+			position: absolute;
+			left: 50%;
+			top: calc(50% + 22px);
+			transform: translateX(-50%);
+			font-size: 11px;
+			letter-spacing: 0.06em;
+			color: var(--muted);
+			white-space: nowrap;
+			opacity: 0;
+			transition: opacity 150ms ease;
+		}
+
+		.dragger:hover .current-year,
+		.dragger.dragging .current-year {
+			opacity: 1;
+		}
+
+
+		/* ========================================
+		   ORBITER IMAGE CLUSTER
+		======================================== */
+
+		.project-cluster {
+			position: absolute;
+			inset: 0;
+			pointer-events: none;
+			z-index: 15;
+		}
+
+		.project-thumb {
+			position: absolute;
+			display: block;
+			opacity: 0;
+			transform: translateY(12px);
+			transition:
+				opacity 350ms ease,
+				transform 350ms ease;
+			pointer-events: none;
+		}
+
+		.project-thumb.visible {
+			opacity: 1;
+			transform: translateY(0);
+			pointer-events: auto;
+		}
+
+		.project-thumb:hover {
+			z-index: 40;
+		}
+
+		.project-thumb img {
+			display: block;
+			width: 100%;
+			height: auto;
+			max-height: 180px;
+			object-fit: cover;
+			border: 0;
+			transition: transform 180ms ease;
+		}
+
+		.project-thumb:hover img {
+			transform: scale(1.025);
+		}
+
+		.thumb-label {
+			display: block;
+			margin-top: 5px;
+			font-size: 10px;
+			letter-spacing: 0.04em;
+			color: var(--muted);
+		}
+
+
+		/* Individual image placement */
+
+		.thumb-night {
+			width: 190px;
+			left: 56%;
+			top: 23%;
+		}
+
+		.thumb-daytime {
+			width: 150px;
+			left: 73%;
+			top: 12%;
+		}
+
+		.thumb-interior {
+			width: 175px;
+			left: 62%;
+			top: 63%;
+		}
+
+		.thumb-leds {
+			width: 135px;
+			left: 82%;
+			top: 58%;
+		}
+
+
+		/* Project title */
+
+		.project-title {
+			position: absolute;
+			left: 50%;
+			top: calc(53% - 145px);
+			font-size: 12px;
+			letter-spacing: 0.06em;
+			color: var(--muted);
+			opacity: 0;
+			transition: opacity 350ms ease;
+			pointer-events: none;
+			z-index: 15;
+		}
+
+		.project-title.visible {
+			opacity: 1;
+		}
+
+
+		/* ========================================
+		   TAGLINE
+		======================================== */
+
+		.tagline {
+			position: absolute;
+			left: 6.5%;
+			bottom: 58px;
+			font-size: 22px;
+			font-weight: 400;
+			line-height: 1.5;
+			letter-spacing: 0.04em;
+			z-index: 10;
+		}
+
+
+		/* ========================================
+		   MOBILE
+		======================================== */
+
+		@media (max-width: 700px) {
+
+			.logo {
+				font-size: 20px;
+			}
+
+			.nav {
+				left: auto;
+				right: 25px;
+				font-size: 20px;
+			}
+
+			.timeline-area {
+				left: 10%;
+				right: 8%;
+			}
+
+			.tagline {
+				font-size: 17px;
+			}
+
+			.thumb-night {
+				width: 125px;
+				left: 43%;
+				top: 25%;
+			}
+
+			.thumb-daytime {
+				width: 100px;
+				left: 68%;
+				top: 17%;
+			}
+
+			.thumb-interior {
+				width: 115px;
+				left: 50%;
+				top: 66%;
+			}
+
+			.thumb-leds {
+				width: 90px;
+				left: 75%;
+				top: 61%;
+			}
+		}
+	</style>
+</head>
+
+
+<body>
+
+	<main class="page">
+
+
+		<!-- HOME BUTTON -->
+
+		<a href={base} class="logo">
+			ASKEW
+		</a>
+
+		<span class="cross red logo-cross"></span>
+
+		<div class="left-line"></div>
+
+		<span class="cross blue bottom-cross"></span>
+
+
+		<!-- NAVIGATION -->
+
+		<nav class="nav">
+
+			<a href={`${base}mission/`}>
+				MISSION
+			</a>
+		
+			<a href={`${base}projects/`}>
+				PROJECTS
+			</a>
+		
+			<a href={`${base}about/`}>
+				ABOUT
+			</a>
+		
+			<a href={`${base}contact/`}>
+				CONTACT
+			</a>
+
+		</nav>
+
+
+		<!-- PROJECT NAME -->
+
+		<div
+			class="project-title"
+			id="projectTitle"
+		>
+			HARMONIC ORBITER / PRESENT
+		</div>
+
+
+		<!-- ORBITER IMAGES -->
+
+		<div
+			class="project-cluster"
+			id="projectCluster"
+		>
+
+			<a
+				class="project-thumb thumb-night"
+				href={`${base}projects/harmonic-orbiter`}
+			>
+				<img
+					src={`${base}images/final_orby.png`}
+					alt="Harmonic Orbiter at night"
+				/>
+				<span class="thumb-label">
+					NIGHT ↗
+				</span>
+			</a>
+
+
+			<a
+				class="project-thumb thumb-daytime"
+				href={`${base}projects/harmonic-orbiter`}
+			>
+				<img
+					src={`${base}images/orby1.jpg`}
+					alt="Harmonic Orbiter during the day"
+				/>
+				<span class="thumb-label">
+					DAYTIME ↗
+				</span>
+			</a>
+
+
+			<a
+				class="project-thumb thumb-interior"
+				href={`${base}projects/harmonic-orbiter`}
+			>
+				<img
+					src={`${base}images/orby2.jpg`}
+					alt="Harmonic Orbiter interior"
+				/>
+				<span class="thumb-label">
+					INTERIOR ↗
+				</span>
+			</a>
+
+
+			<a
+				class="project-thumb thumb-leds"
+				href={`${base}projects/harmonic-orbiter`}
+			>
+				<img
+					src={`${base}images/orby3.jpg`}
+					alt="Harmonic Orbiter LED lighting"
+				/>
+				<span class="thumb-label">
+					LEDS ↗
+				</span>
+			</a>
+
+		</div>
+
+
+		<!-- TIMELINE -->
+
+		<section
+			class="timeline-area"
+			id="timeline"
+		>
+
+			<div class="timeline-track"></div>
+
+			<div class="timeline-start">
+				2018
+			</div>
+
+			<div class="timeline-end">
+				PRESENT
+			</div>
+
+			<span
+				class="cross black end-cross"
+			></span>
+
+
+			<!-- DRAGGABLE LINE -->
+
+			<div
+				class="dragger"
+				id="dragger"
+				role="slider"
+				aria-label="Project timeline"
+				aria-valuemin="2018"
+				aria-valuemax="2026"
+				aria-valuenow="2021"
+				tabindex="0"
+			>
+
+				<div class="dragger-line"></div>
+
+				<span
+					class="cross red dragger-cross"
+				></span>
+
+				<div
+					class="current-year"
+					id="currentYear"
+				>
+					2021
+				</div>
+
+			</div>
+
+		</section>
+
+
+		<!-- TAGLINE -->
+
+		<div class="tagline">
+			architecture for making
+			<br />
+			differently
+		</div>
+
+	</main>
+
+
+	<script>
+
+		const timeline =
+			document.getElementById("timeline");
+
+		const dragger =
+			document.getElementById("dragger");
+
+		const currentYear =
+			document.getElementById("currentYear");
+
+		const projectTitle =
+			document.getElementById("projectTitle");
+
+		const projectThumbs =
+			document.querySelectorAll(".project-thumb");
+
+
+		const startYear = 2018;
+		const endYear = 2026;
+
+		let dragging = false;
+
+
+		/* -------------------------------------
+		   SHOW / HIDE ORBITER
+		------------------------------------- */
+
+		function updateProject(year) {
+
+			/*
+			Show Orbiter as the slider
+			approaches the PRESENT end.
+			*/
+
+			const distanceFromPresent =
+				endYear - year;
+
+
+			if (distanceFromPresent < 0.65) {
+
+				projectTitle
+					.classList
+					.add("visible");
+
+
+				projectThumbs.forEach(
+					(thumb, index) => {
+
+						setTimeout(() => {
+
+							thumb
+								.classList
+								.add("visible");
+
+						}, index * 70);
+
+					}
+				);
+
+			}
+
+			else {
+
+				projectTitle
+					.classList
+					.remove("visible");
+
+
+				projectThumbs.forEach(
+					(thumb) => {
+
+						thumb
+							.classList
+							.remove("visible");
+
+					}
+				);
+
+			}
+
+		}
+
+
+		/* -------------------------------------
+		   MOVE TIMELINE
+		------------------------------------- */
+
+		function setPosition(clientX) {
+
+			const rect =
+				timeline.getBoundingClientRect();
+
+
+			let x =
+				clientX - rect.left;
+
+
+			x = Math.max(
+				0,
+				Math.min(x, rect.width)
+			);
+
+
+			const percentage =
+				x / rect.width;
+
+
+			dragger.style.left =
+				`${percentage * 100}%`;
+
+
+			const exactYear =
+				startYear +
+				percentage *
+				(endYear - startYear);
+
+
+			const displayedYear =
+				Math.round(exactYear);
+
+
+			currentYear.textContent =
+				displayedYear === endYear
+					? "PRESENT"
+					: displayedYear;
+
+
+			dragger.setAttribute(
+				"aria-valuenow",
+				String(displayedYear)
+			);
+
+
+			updateProject(exactYear);
+
+		}
+
+
+		/* -------------------------------------
+		   DRAG
+		------------------------------------- */
+
+		dragger.addEventListener(
+			"pointerdown",
+			(event) => {
+
+				dragging = true;
+
+				dragger
+					.classList
+					.add("dragging");
+
+				dragger.setPointerCapture(
+					event.pointerId
+				);
+
+				setPosition(
+					event.clientX
+				);
+
+			}
+		);
+
+
+		dragger.addEventListener(
+			"pointermove",
+			(event) => {
+
+				if (!dragging) return;
+
+				setPosition(
+					event.clientX
+				);
+
+			}
+		);
+
+
+		dragger.addEventListener(
+			"pointerup",
+			(event) => {
+
+				dragging = false;
+
+				dragger
+					.classList
+					.remove("dragging");
+
+				dragger.releasePointerCapture(
+					event.pointerId
+				);
+
+			}
+		);
+
+
+		/* Click timeline to move */
+
+		timeline.addEventListener(
+			"pointerdown",
+			(event) => {
+
+				if (
+					event.target.closest("#dragger")
+				) {
+					return;
+				}
+
+				setPosition(
+					event.clientX
+				);
+
+			}
+		);
+
+
+		/* Keyboard */
+
+		dragger.addEventListener(
+			"keydown",
+			(event) => {
+
+				const rect =
+					timeline.getBoundingClientRect();
+
+
+				const currentLeft =
+					parseFloat(
+						dragger.style.left || "30"
+					) / 100;
+
+
+				let percentage =
+					currentLeft;
+
+
+				if (event.key === "ArrowLeft") {
+					percentage -= 0.02;
+				}
+
+
+				if (event.key === "ArrowRight") {
+					percentage += 0.02;
+				}
+
+
+				percentage =
+					Math.max(
+						0,
+						Math.min(
+							1,
+							percentage
+						)
+					);
+
+
+				setPosition(
+					rect.left +
+					percentage *
+					rect.width
+				);
+
+			}
+		);
+
+	</script>
+
+</body>
 </html>
