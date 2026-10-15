@@ -272,6 +272,13 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 		.project-thumb {
 			position: absolute;
 			display: block;
+			padding: 0;
+			border: 0;
+			background: none;
+			color: inherit;
+			font: inherit;
+			text-align: left;
+			cursor: zoom-in;
 			opacity: 0;
 			transform: translateY(12px);
 			transition:
@@ -361,6 +368,111 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 
 
 		/* ========================================
+		   FULLSCREEN GALLERY
+		======================================== */
+
+		.gallery {
+			width: 100vw;
+			height: 100vh;
+			max-width: none;
+			max-height: none;
+			margin: 0;
+			padding: 0;
+			border: 0;
+			background: var(--bg);
+			color: var(--ink);
+			font-family: "Courier New", Courier, monospace;
+			overflow: hidden;
+		}
+
+		.gallery::backdrop {
+			background: var(--bg);
+		}
+
+		.gallery[open] {
+			animation: gallery-in 250ms ease;
+		}
+
+		@keyframes gallery-in {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+
+		.gallery button {
+			padding: 0;
+			border: 0;
+			background: none;
+			color: inherit;
+			font: inherit;
+			cursor: pointer;
+		}
+
+		.gallery button:hover {
+			opacity: 0.5;
+		}
+
+		.gallery-title {
+			position: absolute;
+			top: 38px;
+			left: 16px;
+			font-size: 24px;
+			line-height: 1;
+		}
+
+		.gallery-close {
+			position: absolute;
+			top: 38px;
+			right: 25px;
+			font-size: 14px;
+			letter-spacing: 0.06em;
+		}
+
+		.gallery-stage {
+			position: absolute;
+			inset: 100px 90px 80px;
+			margin: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.gallery-stage img {
+			display: block;
+			max-width: 100%;
+			max-height: 100%;
+			object-fit: contain;
+		}
+
+		.gallery-arrow {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			font-size: 28px;
+			padding: 20px !important;
+		}
+
+		.gallery-prev {
+			left: 16px;
+		}
+
+		.gallery-next {
+			right: 16px;
+		}
+
+		.gallery-caption {
+			position: absolute;
+			left: 16px;
+			right: 25px;
+			bottom: 30px;
+			display: flex;
+			justify-content: space-between;
+			font-size: 12px;
+			letter-spacing: 0.06em;
+			color: var(--muted);
+		}
+
+
+		/* ========================================
 		   TAGLINE
 		======================================== */
 
@@ -423,6 +535,25 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 				width: 90px;
 				left: 75%;
 				top: 61%;
+			}
+
+			.gallery-title {
+				font-size: 20px;
+			}
+
+			.gallery-stage {
+				inset: 90px 16px 80px;
+			}
+
+			.gallery-arrow {
+				top: auto;
+				bottom: 50px;
+				transform: none;
+			}
+
+			.gallery-caption {
+				justify-content: center;
+				gap: 16px;
 			}
 		}
 	</style>
@@ -487,9 +618,10 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 			id="projectCluster"
 		>
 
-			<a
+			<button
+				type="button"
 				class="project-thumb thumb-night"
-				href={`${base}projects/harmonic-orbiter`}
+				data-label="NIGHT"
 			>
 				<img
 					src={`${base}images/final_orby.png`}
@@ -498,12 +630,13 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 				<span class="thumb-label">
 					NIGHT ↗
 				</span>
-			</a>
+			</button>
 
 
-			<a
+			<button
+				type="button"
 				class="project-thumb thumb-daytime"
-				href={`${base}projects/harmonic-orbiter`}
+				data-label="DAYTIME"
 			>
 				<img
 					src={`${base}images/orby1.jpg`}
@@ -512,12 +645,13 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 				<span class="thumb-label">
 					DAYTIME ↗
 				</span>
-			</a>
+			</button>
 
 
-			<a
+			<button
+				type="button"
 				class="project-thumb thumb-interior"
-				href={`${base}projects/harmonic-orbiter`}
+				data-label="INTERIOR"
 			>
 				<img
 					src={`${base}images/orby2.jpg`}
@@ -526,12 +660,13 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 				<span class="thumb-label">
 					INTERIOR ↗
 				</span>
-			</a>
+			</button>
 
 
-			<a
+			<button
+				type="button"
 				class="project-thumb thumb-leds"
-				href={`${base}projects/harmonic-orbiter`}
+				data-label="LEDS"
 			>
 				<img
 					src={`${base}images/orby3.jpg`}
@@ -540,9 +675,60 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 				<span class="thumb-label">
 					LEDS ↗
 				</span>
-			</a>
+			</button>
 
 		</div>
+
+
+		<!-- FULLSCREEN GALLERY -->
+
+		<dialog
+			class="gallery"
+			id="gallery"
+			aria-label="Harmonic Orbiter gallery"
+		>
+
+			<div class="gallery-title">
+				HARMONIC ORBITER
+			</div>
+
+			<button
+				type="button"
+				class="gallery-close"
+				id="galleryClose"
+				aria-label="Close gallery"
+			>
+				CLOSE ✕
+			</button>
+
+			<figure class="gallery-stage">
+				<img id="galleryImage" src="" alt="" />
+			</figure>
+
+			<button
+				type="button"
+				class="gallery-arrow gallery-prev"
+				id="galleryPrev"
+				aria-label="Previous image"
+			>
+				←
+			</button>
+
+			<button
+				type="button"
+				class="gallery-arrow gallery-next"
+				id="galleryNext"
+				aria-label="Next image"
+			>
+				→
+			</button>
+
+			<div class="gallery-caption">
+				<span id="galleryLabel"></span>
+				<span id="galleryCount"></span>
+			</div>
+
+		</dialog>
 
 
 		<!-- TIMELINE -->
@@ -871,6 +1057,157 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 					percentage *
 					rect.width
 				);
+
+			}
+		);
+
+
+		/* -------------------------------------
+		   FULLSCREEN GALLERY
+		------------------------------------- */
+
+		const gallery =
+			document.getElementById("gallery");
+
+		const galleryImage =
+			document.getElementById("galleryImage");
+
+		const galleryLabel =
+			document.getElementById("galleryLabel");
+
+		const galleryCount =
+			document.getElementById("galleryCount");
+
+		let galleryIndex = 0;
+
+
+		function showImage(index) {
+
+			const total = projectThumbs.length;
+
+			galleryIndex =
+				(index + total) % total;
+
+			const thumb =
+				projectThumbs[galleryIndex];
+
+			const thumbImage =
+				thumb.querySelector("img");
+
+			galleryImage.src = thumbImage.src;
+			galleryImage.alt = thumbImage.alt;
+
+			galleryLabel.textContent =
+				thumb.dataset.label;
+
+			galleryCount.textContent =
+				`${String(galleryIndex + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
+
+		}
+
+
+		projectThumbs.forEach(
+			(thumb, index) => {
+
+				thumb.addEventListener(
+					"click",
+					() => {
+
+						showImage(index);
+						gallery.showModal();
+
+					}
+				);
+
+			}
+		);
+
+
+		document
+			.getElementById("galleryPrev")
+			.addEventListener(
+				"click",
+				() => showImage(galleryIndex - 1)
+			);
+
+		document
+			.getElementById("galleryNext")
+			.addEventListener(
+				"click",
+				() => showImage(galleryIndex + 1)
+			);
+
+		document
+			.getElementById("galleryClose")
+			.addEventListener(
+				"click",
+				() => gallery.close()
+			);
+
+
+		/* Arrow keys browse, Escape closes (built into dialog) */
+
+		gallery.addEventListener(
+			"keydown",
+			(event) => {
+
+				if (event.key === "ArrowLeft") {
+					showImage(galleryIndex - 1);
+				}
+
+				if (event.key === "ArrowRight") {
+					showImage(galleryIndex + 1);
+				}
+
+			}
+		);
+
+
+		/* Click empty space around the image to close */
+
+		gallery.addEventListener(
+			"click",
+			(event) => {
+
+				if (
+					event.target === gallery ||
+					event.target.classList.contains("gallery-stage")
+				) {
+					gallery.close();
+				}
+
+			}
+		);
+
+
+		/* Swipe on touch screens */
+
+		let touchStartX = null;
+
+		gallery.addEventListener(
+			"touchstart",
+			(event) => {
+				touchStartX = event.touches[0].clientX;
+			},
+			{ passive: true }
+		);
+
+		gallery.addEventListener(
+			"touchend",
+			(event) => {
+
+				if (touchStartX === null) return;
+
+				const deltaX =
+					event.changedTouches[0].clientX - touchStartX;
+
+				if (Math.abs(deltaX) > 50) {
+					showImage(
+						galleryIndex + (deltaX < 0 ? 1 : -1)
+					);
+				}
+
+				touchStartX = null;
 
 			}
 		);
