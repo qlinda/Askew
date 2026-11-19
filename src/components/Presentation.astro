@@ -1,0 +1,511 @@
+---
+/*
+Fullscreen presentation of askew_final.pdf, opened by any
+button with the `data-open-presentation` attribute (the MORE
+link in each page's nav). Slides are drawn from the PDF with
+pdf.js so they stay sharp at any size; pdf.js is only
+downloaded the first time the presentation is opened.
+*/
+---
+
+<dialog
+	class="slides"
+	id="slides"
+	aria-label="ASKEW presentation"
+>
+
+	<button
+		type="button"
+		class="slides-close"
+		id="slidesClose"
+		aria-label="Close presentation"
+	>
+		CLOSE ✕
+	</button>
+
+	<div
+		class="slides-stage"
+		id="slidesStage"
+	>
+		<span
+			class="slides-loading"
+			id="slidesLoading"
+		>
+			LOADING…
+		</span>
+		<canvas
+			id="slidesCanvas"
+			aria-label="Presentation slide"
+		></canvas>
+	</div>
+
+	<button
+		type="button"
+		class="slides-arrow slides-prev"
+		id="slidesPrev"
+		aria-label="Previous slide"
+	>
+		←
+	</button>
+
+	<button
+		type="button"
+		class="slides-arrow slides-next"
+		id="slidesNext"
+		aria-label="Next slide"
+	>
+		→
+	</button>
+
+	<div class="slides-caption">
+		<span>PRESENTATION</span>
+		<span id="slidesCount"></span>
+	</div>
+
+</dialog>
+
+
+<style>
+
+	/* MORE sits in each page's nav, so this one is global */
+
+	:global(.nav-more) {
+		padding: 0;
+		border: 0;
+		background: none;
+		color: inherit;
+		font: inherit;
+		line-height: inherit;
+		text-align: left;
+		cursor: pointer;
+	}
+
+	:global(.nav-more:hover) {
+		opacity: 0.5;
+	}
+
+
+	.slides {
+		width: 100vw;
+		height: 100vh;
+		max-width: none;
+		max-height: none;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		background: #eeeeec;
+		color: #111111;
+		font-family: "Courier New", Courier, monospace;
+		overflow: hidden;
+	}
+
+	.slides::backdrop {
+		background: #eeeeec;
+	}
+
+	.slides[open] {
+		animation: slides-in 250ms ease;
+	}
+
+	@keyframes slides-in {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
+
+	.slides button {
+		padding: 0;
+		border: 0;
+		background: none;
+		color: inherit;
+		font: inherit;
+		cursor: pointer;
+	}
+
+	.slides button:hover {
+		opacity: 0.5;
+	}
+
+	.slides-close {
+		position: absolute;
+		top: 38px;
+		right: 25px;
+		font-size: 14px;
+		letter-spacing: 0.06em;
+	}
+
+	.slides-stage {
+		position: absolute;
+		inset: 64px 72px 60px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.slides-stage canvas {
+		display: block;
+		cursor: pointer;
+	}
+
+	.slides-loading {
+		position: absolute;
+		font-size: 12px;
+		letter-spacing: 0.06em;
+		color: #686868;
+	}
+
+	.slides-arrow {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		font-size: 28px;
+		padding: 20px !important;
+	}
+
+	.slides-arrow:disabled {
+		opacity: 0.2;
+		cursor: default;
+	}
+
+	.slides-prev {
+		left: 16px;
+	}
+
+	.slides-next {
+		right: 16px;
+	}
+
+	.slides-caption {
+		position: absolute;
+		left: 16px;
+		right: 25px;
+		bottom: 30px;
+		display: flex;
+		justify-content: space-between;
+		font-size: 12px;
+		letter-spacing: 0.06em;
+		color: #686868;
+	}
+
+
+	@media (max-width: 700px) {
+
+		.slides-stage {
+			inset: 90px 16px 110px;
+		}
+
+		.slides-arrow {
+			top: auto;
+			bottom: 50px;
+			transform: none;
+		}
+
+		.slides-caption {
+			justify-content: center;
+			gap: 16px;
+		}
+
+	}
+
+</style>
+
+
+<script>
+
+	const slidesUrl =
+		`${import.meta.env.BASE_URL.replace(/\/?$/, "/")}files/askew_final.pdf`;
+
+	const slides =
+		document.getElementById("slides");
+
+	const slidesStage =
+		document.getElementById("slidesStage");
+
+	const slidesCanvas =
+		document.getElementById("slidesCanvas");
+
+	const slidesLoading =
+		document.getElementById("slidesLoading");
+
+	const slidesCount =
+		document.getElementById("slidesCount");
+
+	const slidesPrev =
+		document.getElementById("slidesPrev");
+
+	const slidesNext =
+		document.getElementById("slidesNext");
+
+	let pdfPromise = null;
+	let slideIndex = 0;
+	let renderTask = null;
+
+
+	function loadPdf() {
+
+		if (!pdfPromise) {
+
+			pdfPromise = (async () => {
+
+				const pdfjs =
+					await import("pdfjs-dist");
+
+				const { default: workerUrl } =
+					await import("pdfjs-dist/build/pdf.worker.min.mjs?url");
+
+				pdfjs.GlobalWorkerOptions.workerSrc =
+					workerUrl;
+
+				return pdfjs
+					.getDocument({ url: slidesUrl })
+					.promise;
+
+			})();
+
+			/* Let a later click try again if loading failed */
+			pdfPromise.catch(() => {
+				pdfPromise = null;
+				slidesLoading.textContent = "COULD NOT LOAD PRESENTATION";
+			});
+
+		}
+
+		return pdfPromise;
+
+	}
+
+
+	async function renderSlide() {
+
+		const pdf = await loadPdf();
+
+		slideIndex =
+			Math.max(0, Math.min(slideIndex, pdf.numPages - 1));
+
+		const page =
+			await pdf.getPage(slideIndex + 1);
+
+		const baseViewport =
+			page.getViewport({ scale: 1 });
+
+		const stageRect =
+			slidesStage.getBoundingClientRect();
+
+		const fitScale =
+			Math.min(
+				stageRect.width / baseViewport.width,
+				stageRect.height / baseViewport.height
+			);
+
+		const pixelRatio =
+			window.devicePixelRatio || 1;
+
+		const viewport =
+			page.getViewport({ scale: fitScale * pixelRatio });
+
+		if (renderTask) {
+			renderTask.cancel();
+		}
+
+		slidesCanvas.width =
+			Math.floor(viewport.width);
+
+		slidesCanvas.height =
+			Math.floor(viewport.height);
+
+		slidesCanvas.style.width =
+			`${Math.floor(baseViewport.width * fitScale)}px`;
+
+		slidesCanvas.style.height =
+			`${Math.floor(baseViewport.height * fitScale)}px`;
+
+		renderTask =
+			page.render({
+				canvas: slidesCanvas,
+				canvasContext: slidesCanvas.getContext("2d"),
+				viewport,
+			});
+
+		try {
+			await renderTask.promise;
+		}
+		catch (error) {
+			/* A newer render cancelled this one */
+			if (error?.name !== "RenderingCancelledException") {
+				throw error;
+			}
+			return;
+		}
+
+		slidesLoading.hidden = true;
+
+		slidesCount.textContent =
+			`${String(slideIndex + 1).padStart(2, "0")} / ${String(pdf.numPages).padStart(2, "0")}`;
+
+		slidesPrev.disabled =
+			slideIndex === 0;
+
+		slidesNext.disabled =
+			slideIndex === pdf.numPages - 1;
+
+	}
+
+
+	function goToSlide(index) {
+
+		slideIndex = index;
+		renderSlide();
+
+	}
+
+
+	document
+		.querySelectorAll("[data-open-presentation]")
+		.forEach(
+			(button) => {
+
+				button.addEventListener(
+					"click",
+					() => {
+
+						slideIndex = 0;
+						slides.showModal();
+
+						/* True full screen where the browser allows it */
+						if (slides.requestFullscreen) {
+							slides
+								.requestFullscreen()
+								.catch(() => {});
+						}
+
+						renderSlide();
+
+					}
+				);
+
+			}
+		);
+
+
+	slidesPrev.addEventListener(
+		"click",
+		() => goToSlide(slideIndex - 1)
+	);
+
+	slidesNext.addEventListener(
+		"click",
+		() => goToSlide(slideIndex + 1)
+	);
+
+	/* Click the slide to advance */
+	slidesCanvas.addEventListener(
+		"click",
+		() => goToSlide(slideIndex + 1)
+	);
+
+	document
+		.getElementById("slidesClose")
+		.addEventListener(
+			"click",
+			() => slides.close()
+		);
+
+	slides.addEventListener(
+		"close",
+		() => {
+
+			if (document.fullscreenElement) {
+				document
+					.exitFullscreen()
+					.catch(() => {});
+			}
+
+		}
+	);
+
+
+	/* Arrow keys, space and page keys move between slides */
+
+	slides.addEventListener(
+		"keydown",
+		(event) => {
+
+			if (
+				event.key === "ArrowRight" ||
+				event.key === "PageDown" ||
+				event.key === " "
+			) {
+				event.preventDefault();
+				goToSlide(slideIndex + 1);
+			}
+
+			if (
+				event.key === "ArrowLeft" ||
+				event.key === "PageUp"
+			) {
+				event.preventDefault();
+				goToSlide(slideIndex - 1);
+			}
+
+		}
+	);
+
+
+	/* Re-draw at the new size when the window or full screen changes */
+
+	let resizeFrame = null;
+
+	function rerenderIfOpen() {
+
+		if (!slides.open) return;
+
+		cancelAnimationFrame(resizeFrame);
+
+		resizeFrame =
+			requestAnimationFrame(renderSlide);
+
+	}
+
+	window.addEventListener(
+		"resize",
+		rerenderIfOpen
+	);
+
+	document.addEventListener(
+		"fullscreenchange",
+		rerenderIfOpen
+	);
+
+
+	/* Swipe on touch screens */
+
+	let slidesTouchX = null;
+
+	slides.addEventListener(
+		"touchstart",
+		(event) => {
+			slidesTouchX = event.touches[0].clientX;
+		},
+		{ passive: true }
+	);
+
+	slides.addEventListener(
+		"touchend",
+		(event) => {
+
+			if (slidesTouchX === null) return;
+
+			const deltaX =
+				event.changedTouches[0].clientX - slidesTouchX;
+
+			if (Math.abs(deltaX) > 50) {
+				goToSlide(
+					slideIndex + (deltaX < 0 ? 1 : -1)
+				);
+			}
+
+			slidesTouchX = null;
+
+		}
+	);
+
+</script>

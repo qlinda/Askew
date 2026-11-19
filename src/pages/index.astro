@@ -1,7 +1,27 @@
 ---
+import Presentation from "../components/Presentation.astro";
+
 const base = import.meta.env.BASE_URL.endsWith("/")
     ? import.meta.env.BASE_URL
     : `${import.meta.env.BASE_URL}/`;
+
+const startYear = 2023;
+const endYear = 2026;
+
+/*
+`position` is where the project sits on the slider, so
+projects that share a year get their own point.
+*/
+const projects = [
+	{ title: "Green House", year: 2024, position: 2024, image: "green-house.jpg", width: 581, height: 872 },
+	{ title: "Timber Cabin", year: 2024, position: 2024.5, image: "timber-cabin.jpg", width: 700, height: 467 },
+	{ title: "Cob Construction", year: 2025, position: 2025, image: "cob-construction.jpg", width: 736, height: 1104 },
+	{ title: "Materials Research", year: 2025, position: 2025.5, image: "materials-research.jpg", width: 1200, height: 1500 },
+	{ title: "Bamboo Research Center", year: 2026, position: 2026, image: "bamboo-research-center.jpg", width: 1200, height: 847 },
+];
+
+const sliderPercent = (position) =>
+	((position - startYear) / (endYear - startYear)) * 100;
 ---
 
 <html lang="en">
@@ -168,7 +188,7 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 			position: absolute;
 			left: 6%;
 			right: 5%;
-			top: 53%;
+			top: 58%;
 			height: 300px;
 		}
 
@@ -185,7 +205,7 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 		.timeline-start,
 		.timeline-end {
 			position: absolute;
-			top: 70px;
+			top: 112px;
 			font-size: 14px;
 			letter-spacing: 0.04em;
 			color: var(--muted);
@@ -258,19 +278,42 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 		}
 
 
+		/* Project year ticks */
+
+		.timeline-tick {
+			position: absolute;
+			top: 94px;
+			width: 1px;
+			height: 12px;
+			background: var(--ink);
+			transform: translateX(-0.5px);
+			pointer-events: none;
+		}
+
+
 		/* ========================================
-		   ORBITER IMAGE CLUSTER
+		   PROJECT IMAGES
 		======================================== */
+
+		/*
+		Images sit inside the timeline area so each
+		one can be centred over its own slider point.
+		JS sizes and nudges them to stay on screen.
+		*/
 
 		.project-cluster {
 			position: absolute;
-			inset: 0;
+			left: 0;
+			right: 0;
+			top: 0;
+			height: 100px;
 			pointer-events: none;
-			z-index: 15;
+			z-index: 35;
 		}
 
 		.project-thumb {
 			position: absolute;
+			bottom: 12px;
 			display: block;
 			padding: 0;
 			border: 0;
@@ -299,9 +342,8 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 
 		.project-thumb img {
 			display: block;
-			width: 100%;
+			width: 300px;
 			height: auto;
-			max-height: 180px;
 			object-fit: cover;
 			border: 0;
 			transition: transform 180ms ease;
@@ -319,51 +361,13 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 			color: var(--muted);
 		}
 
-
-		/* Individual image placement */
-
-		.thumb-night {
-			width: 190px;
-			left: 56%;
-			top: 23%;
-		}
-
-		.thumb-daytime {
-			width: 150px;
-			left: 73%;
-			top: 12%;
-		}
-
-		.thumb-interior {
-			width: 175px;
-			left: 62%;
-			top: 63%;
-		}
-
-		.thumb-leds {
-			width: 135px;
-			left: 82%;
-			top: 58%;
-		}
-
-
-		/* Project title */
-
-		.project-title {
-			position: absolute;
-			left: 50%;
-			top: calc(53% - 145px);
+		.thumb-title {
+			display: block;
+			margin-bottom: 8px;
 			font-size: 12px;
 			letter-spacing: 0.06em;
 			color: var(--muted);
-			opacity: 0;
-			transition: opacity 350ms ease;
-			pointer-events: none;
-			z-index: 15;
-		}
-
-		.project-title.visible {
-			opacity: 1;
+			white-space: nowrap;
 		}
 
 
@@ -513,30 +517,6 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 				font-size: 17px;
 			}
 
-			.thumb-night {
-				width: 125px;
-				left: 43%;
-				top: 25%;
-			}
-
-			.thumb-daytime {
-				width: 100px;
-				left: 68%;
-				top: 17%;
-			}
-
-			.thumb-interior {
-				width: 115px;
-				left: 50%;
-				top: 66%;
-			}
-
-			.thumb-leds {
-				width: 90px;
-				left: 75%;
-				top: 61%;
-			}
-
 			.gallery-title {
 				font-size: 20px;
 			}
@@ -590,94 +570,19 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 				PROJECTS
 			</a>
 		
-			<a href={`${base}about/`}>
-				ABOUT
-			</a>
-		
 			<a href={`${base}contact/`}>
 				CONTACT
 			</a>
 
+			<button
+				type="button"
+				class="nav-more"
+				data-open-presentation
+			>
+				MORE
+			</button>
+
 		</nav>
-
-
-		<!-- PROJECT NAME -->
-
-		<div
-			class="project-title"
-			id="projectTitle"
-		>
-			HARMONIC ORBITER / PRESENT
-		</div>
-
-
-		<!-- ORBITER IMAGES -->
-
-		<div
-			class="project-cluster"
-			id="projectCluster"
-		>
-
-			<button
-				type="button"
-				class="project-thumb thumb-night"
-				data-label="NIGHT"
-			>
-				<img
-					src={`${base}images/final_orby.jpg`}
-					alt="Harmonic Orbiter at night"
-				/>
-				<span class="thumb-label">
-					NIGHT ↗
-				</span>
-			</button>
-
-
-			<button
-				type="button"
-				class="project-thumb thumb-daytime"
-				data-label="DAYTIME"
-			>
-				<img
-					src={`${base}images/orby1.jpg`}
-					alt="Harmonic Orbiter during the day"
-				/>
-				<span class="thumb-label">
-					DAYTIME ↗
-				</span>
-			</button>
-
-
-			<button
-				type="button"
-				class="project-thumb thumb-interior"
-				data-label="INTERIOR"
-			>
-				<img
-					src={`${base}images/orby2.jpg`}
-					alt="Harmonic Orbiter interior"
-				/>
-				<span class="thumb-label">
-					INTERIOR ↗
-				</span>
-			</button>
-
-
-			<button
-				type="button"
-				class="project-thumb thumb-leds"
-				data-label="LEDS"
-			>
-				<img
-					src={`${base}images/orby3.jpg`}
-					alt="Harmonic Orbiter LED lighting"
-				/>
-				<span class="thumb-label">
-					LEDS ↗
-				</span>
-			</button>
-
-		</div>
 
 
 		<!-- FULLSCREEN GALLERY -->
@@ -685,12 +590,13 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 		<dialog
 			class="gallery"
 			id="gallery"
-			aria-label="Harmonic Orbiter gallery"
+			aria-label="Project gallery"
 		>
 
-			<div class="gallery-title">
-				HARMONIC ORBITER
-			</div>
+			<div
+				class="gallery-title"
+				id="galleryTitle"
+			></div>
 
 			<button
 				type="button"
@@ -731,6 +637,11 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 		</dialog>
 
 
+		<!-- FULLSCREEN PRESENTATION (MORE) -->
+
+		<Presentation />
+
+
 		<!-- TIMELINE -->
 
 		<section
@@ -740,8 +651,49 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 
 			<div class="timeline-track"></div>
 
+			{projects.map((project) => (
+				<span
+					class="timeline-tick"
+					style={`left: ${sliderPercent(project.position)}%`}
+				></span>
+			))}
+
+			<!-- PROJECT IMAGES -->
+
+			<div
+				class="project-cluster"
+				id="projectCluster"
+			>
+
+				{projects.map((project) => (
+					<button
+						type="button"
+						class="project-thumb"
+						data-title={project.title.toUpperCase()}
+						data-year={project.year}
+						data-position={project.position}
+						style={`left: ${sliderPercent(project.position)}%`}
+					>
+						<span class="thumb-title">
+							{project.title.toUpperCase()} / {project.year}
+						</span>
+						<img
+							src={`${base}images/${project.image}`}
+							alt={project.title}
+							width={project.width}
+							height={project.height}
+						/>
+						<span class="thumb-label">
+							VIEW ↗
+						</span>
+					</button>
+				))}
+
+			</div>
+
+
 			<div class="timeline-start">
-				2018
+				{startYear}
 			</div>
 
 			<div class="timeline-end">
@@ -760,9 +712,9 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 				id="dragger"
 				role="slider"
 				aria-label="Project timeline"
-				aria-valuemin="2018"
-				aria-valuemax="2026"
-				aria-valuenow="2021"
+				aria-valuemin={startYear}
+				aria-valuemax={endYear}
+				aria-valuenow={startYear}
 				tabindex="0"
 			>
 
@@ -776,7 +728,7 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 					class="current-year"
 					id="currentYear"
 				>
-					2021
+					{startYear}
 				</div>
 
 			</div>
@@ -806,77 +758,226 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 		const currentYear =
 			document.getElementById("currentYear");
 
-		const projectTitle =
-			document.getElementById("projectTitle");
-
 		const projectThumbs =
 			document.querySelectorAll(".project-thumb");
 
 
-		const startYear = 2018;
+		const startYear = 2023;
 		const endYear = 2026;
 
 		let dragging = false;
 
 
 		/* -------------------------------------
-		   SHOW / HIDE ORBITER
+		   SHOW / HIDE PROJECTS
 		------------------------------------- */
 
 		function updateProject(year) {
 
 			/*
-			Show Orbiter as the slider
-			approaches the PRESENT end.
+			Show the project closest to the
+			slider, if one is within reach.
 			*/
 
-			const distanceFromPresent =
-				endYear - year;
+			let nearest = null;
+			let nearestDistance = 0.65;
 
+			projectThumbs.forEach(
+				(thumb) => {
 
-			if (distanceFromPresent < 0.65) {
+					const distance =
+						Math.abs(
+							Number(thumb.dataset.position) - year
+						);
 
-				projectTitle
-					.classList
-					.add("visible");
-
-
-				projectThumbs.forEach(
-					(thumb, index) => {
-
-						setTimeout(() => {
-
-							thumb
-								.classList
-								.add("visible");
-
-						}, index * 70);
-
+					if (distance < nearestDistance) {
+						nearest = thumb;
+						nearestDistance = distance;
 					}
-				);
 
-			}
-
-			else {
-
-				projectTitle
-					.classList
-					.remove("visible");
+				}
+			);
 
 
-				projectThumbs.forEach(
-					(thumb) => {
+			projectThumbs.forEach(
+				(thumb) => {
 
-						thumb
-							.classList
-							.remove("visible");
+					thumb
+						.classList
+						.toggle("visible", thumb === nearest);
 
-					}
-				);
-
-			}
+				}
+			);
 
 		}
+
+
+		/* -------------------------------------
+		   SIZE + PLACE PROJECT IMAGES
+		------------------------------------- */
+
+		/*
+		Each image is first fitted as large as it can
+		be (up to 18% of the screen) without running
+		off the top of the screen or into the nav,
+		then scaled down by imageScale. It is centred
+		over its slider point, sliding sideways to
+		stay inside the screen edges.
+		*/
+
+		const targetArea = 0.18;
+		const imageScale = 0.75;
+		const edgeGap = 16;
+		const nav = document.querySelector(".nav");
+
+		function layoutThumbs() {
+
+			const timelineRect =
+				timeline.getBoundingClientRect();
+
+			if (timelineRect.width === 0) return;
+
+			const navRect =
+				nav.getBoundingClientRect();
+
+			const screenArea =
+				window.innerWidth * window.innerHeight;
+
+			projectThumbs.forEach(
+				(thumb) => {
+
+					const image =
+						thumb.querySelector("img");
+
+					const ratio =
+						Number(image.getAttribute("width")) /
+						Number(image.getAttribute("height"));
+
+					const tickX =
+						timelineRect.left +
+						(
+							(Number(thumb.dataset.position) - startYear) /
+							(endYear - startYear)
+						) *
+						timelineRect.width;
+
+					/* Room taken by the title and VIEW label */
+					const captionHeight =
+						thumb.offsetHeight - image.offsetHeight;
+
+					/* Where the bottom of the image block sits */
+					const blockBottom =
+						timelineRect.top + 100 - 12;
+
+					/*
+					Keep the slider point under the image, not just
+					at an edge (less margin when the point is near
+					the side of the screen).
+					*/
+					const tickInset =
+						Math.max(
+							0,
+							Math.min(
+								40,
+								tickX - edgeGap,
+								window.innerWidth - edgeGap - tickX
+							)
+						);
+
+
+					/*
+					For a given width, find where the image can go:
+					centred over the point if possible, otherwise
+					slid sideways (point still underneath) to clear
+					the nav and the screen edges. Returns null if
+					there is no room.
+					*/
+					function place(w) {
+
+						const top =
+							blockBottom - captionHeight - w / ratio;
+
+						if (top < edgeGap) return null;
+
+						const minLeft =
+							Math.max(edgeGap, tickX + tickInset - w);
+
+						const maxLeft =
+							Math.min(
+								window.innerWidth - edgeGap - w,
+								tickX - tickInset
+							);
+
+						if (minLeft > maxLeft) return null;
+
+						const clamp = (x) =>
+							Math.min(Math.max(x, minLeft), maxLeft);
+
+						const centred =
+							clamp(tickX - w / 2);
+
+						if (top >= navRect.bottom + edgeGap) {
+							return centred;
+						}
+
+						/* Image reaches nav height: it must sit beside the nav */
+						const candidates = [
+							centred,
+							clamp(navRect.right + edgeGap),
+							clamp(navRect.left - edgeGap - w),
+						].filter(
+							(x) =>
+								x + w <= navRect.left - edgeGap + 0.5 ||
+								x >= navRect.right + edgeGap - 0.5
+						);
+
+						if (candidates.length === 0) return null;
+
+						return candidates.reduce(
+							(best, x) =>
+								Math.abs(x - centred) < Math.abs(best - centred)
+									? x
+									: best
+						);
+
+					}
+
+
+					let width =
+						Math.min(
+							Math.sqrt(screenArea * targetArea * ratio),
+							window.innerWidth - edgeGap * 2
+						);
+
+					let left = place(width);
+
+					while (left === null && width > 120) {
+						width -= 10;
+						left = place(width);
+					}
+
+					width *= imageScale;
+					left = place(width);
+
+					if (left === null) {
+						left = Math.max(edgeGap, tickX - width / 2);
+					}
+
+					image.style.width =
+						`${width}px`;
+
+					thumb.style.left =
+						`${left - timelineRect.left}px`;
+
+				}
+			);
+
+		}
+
+		window.addEventListener(
+			"resize",
+			layoutThumbs
+		);
 
 
 		/* -------------------------------------
@@ -887,6 +988,8 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 
 			const rect =
 				timeline.getBoundingClientRect();
+
+			if (rect.width === 0) return;
 
 
 			let x =
@@ -999,7 +1102,8 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 			(event) => {
 
 				if (
-					event.target.closest("#dragger")
+					event.target.closest("#dragger") ||
+					event.target.closest(".project-thumb")
 				) {
 					return;
 				}
@@ -1062,6 +1166,35 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 		);
 
 
+		/* Start on the first project */
+
+		function setInitialPosition() {
+
+			layoutThumbs();
+
+			const initialRect =
+				timeline.getBoundingClientRect();
+
+			setPosition(
+				initialRect.left +
+				0.3 *
+				initialRect.width
+			);
+
+		}
+
+		if (document.readyState === "complete") {
+			setInitialPosition();
+		}
+
+		else {
+			window.addEventListener(
+				"load",
+				setInitialPosition
+			);
+		}
+
+
 		/* -------------------------------------
 		   FULLSCREEN GALLERY
 		------------------------------------- */
@@ -1071,6 +1204,9 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 
 		const galleryImage =
 			document.getElementById("galleryImage");
+
+		const galleryTitle =
+			document.getElementById("galleryTitle");
 
 		const galleryLabel =
 			document.getElementById("galleryLabel");
@@ -1097,8 +1233,11 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 			galleryImage.src = thumbImage.src;
 			galleryImage.alt = thumbImage.alt;
 
+			galleryTitle.textContent =
+				thumb.dataset.title;
+
 			galleryLabel.textContent =
-				thumb.dataset.label;
+				thumb.dataset.year;
 
 			galleryCount.textContent =
 				`${String(galleryIndex + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;

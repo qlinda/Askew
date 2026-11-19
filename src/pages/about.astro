@@ -1,4 +1,6 @@
 ---
+import Presentation from "../components/Presentation.astro";
+
 const base = import.meta.env.BASE_URL.endsWith("/")
     ? import.meta.env.BASE_URL
     : `${import.meta.env.BASE_URL}/`;
@@ -79,6 +81,7 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 			font-size: 24px;
 			font-weight: 400;
 			line-height: 1.2;
+			z-index: 50;
 		}
 
 		.nav a:hover {
@@ -339,15 +342,24 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 				PROJECTS
 			</a>
 
-			<a href={`${base}about/`} class="active">
-				ABOUT
-			</a>
-
 			<a href={`${base}contact/`}>
 				CONTACT
 			</a>
 
+			<button
+				type="button"
+				class="nav-more"
+				data-open-presentation
+			>
+				MORE
+			</button>
+
 		</nav>
+
+
+		<!-- FULLSCREEN PRESENTATION (MORE) -->
+
+		<Presentation />
 
 
 
