@@ -233,7 +233,7 @@ const sliderPercent = (position) =>
 
 		.dragger {
 			position: absolute;
-			left: 30%;
+			left: 0;
 			top: 100px;
 			width: 32px;
 			height: 350px;
@@ -570,8 +570,8 @@ const sliderPercent = (position) =>
 				PROJECTS
 			</a>
 		
-			<a href={`${base}contact/`}>
-				CONTACT
+			<a href={`${base}about/`}>
+				ABOUT
 			</a>
 
 			<button
@@ -1128,7 +1128,7 @@ const sliderPercent = (position) =>
 
 				const currentLeft =
 					parseFloat(
-						dragger.style.left || "30"
+						dragger.style.left || "0"
 					) / 100;
 
 
@@ -1166,7 +1166,7 @@ const sliderPercent = (position) =>
 		);
 
 
-		/* Start on the first project */
+		/* Start at the beginning of the timeline (2023) */
 
 		function setInitialPosition() {
 
@@ -1176,9 +1176,7 @@ const sliderPercent = (position) =>
 				timeline.getBoundingClientRect();
 
 			setPosition(
-				initialRect.left +
-				0.3 *
-				initialRect.width
+				initialRect.left
 			);
 
 		}

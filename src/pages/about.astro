@@ -65,10 +65,6 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 			line-height: 1;
 		}
 
-		.logo:hover {
-			opacity: 0.5;
-		}
-
 		.nav {
 			position: absolute;
 			top: 38px;
@@ -179,7 +175,7 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 			max-width: 1250px;
 		}
 
-		.section-label {
+		.about-label {
 			font-size: 12px;
 			color: var(--muted);
 			letter-spacing: 0.08em;
@@ -187,19 +183,60 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 			margin-bottom: 28px;
 		}
 
-		.intro {
-			max-width: 900px;
 
-			font-size: clamp(24px, 2.5vw, 39px);
-			line-height: 1.28;
-			letter-spacing: -0.025em;
+		/* Photo beside the founder statement */
+
+		.founder {
+			display: grid;
+
+			grid-template-columns:
+				minmax(0, 5fr) minmax(0, 7fr);
+
+			column-gap: 8%;
+			align-items: start;
+		}
+
+		.photo {
+			position: relative;
+			margin: 0;
+		}
+
+		.photo img {
+			display: block;
+			width: 100%;
+			height: auto;
+		}
+
+		/* Registration mark on the photo's corner */
+		.photo-cross {
+			left: 0;
+			top: 0;
+		}
+
+		.block-number {
+			display: block;
+
+			font-size: 11px;
+			color: var(--muted);
+
+			margin-bottom: 18px;
+
+			letter-spacing: 0.08em;
+		}
+
+		.statement {
+			max-width: 640px;
+
+			font-size: clamp(18px, 1.6vw, 24px);
+			line-height: 1.5;
+			letter-spacing: -0.01em;
 
 			margin: 0;
 		}
 
 
 		/* ========================================
-		   ALIGNMENT LINE BETWEEN SECTIONS
+		   ALIGNMENT LINE
 		   ======================================== */
 
 		.divider {
@@ -211,7 +248,6 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 			background: var(--ink);
 
 			margin-top: 80px;
-			margin-bottom: 65px;
 		}
 
 		.divider-cross {
@@ -223,49 +259,21 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 
 
 		/* ========================================
-		   WORKFLOW DIAGRAM
+		   SMALL QUIRK / REGISTRATION MARK
 		   ======================================== */
 
-		.workflow {
-			margin: 0;
-		}
+		.side-note {
+			position: absolute;
 
-		.workflow img {
-			display: block;
+			right: 4%;
+			top: 58%;
 
-			width: 100%;
-			height: auto;
-
-			/* drop the diagram's paper tone into the page background */
-			mix-blend-mode: multiply;
-		}
-
-
-		/* ========================================
-		   PROCESS STEPS
-		   ======================================== */
-
-		.steps {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 14px 48px;
-
-			list-style: none;
-			padding: 0;
-			margin: 48px 0 0;
-
-			font-size: 14px;
-			letter-spacing: 0.06em;
-		}
-
-		.steps li {
-			counter-increment: step;
-		}
-
-		.steps li::before {
-			content: counter(step, decimal-leading-zero) " ";
-			color: var(--muted);
 			font-size: 11px;
+			line-height: 1.5;
+
+			color: var(--muted);
+
+			writing-mode: vertical-rl;
 		}
 
 
@@ -293,18 +301,17 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 				margin-right: 8%;
 			}
 
-			.intro {
-				font-size: 23px;
+			.founder {
+				grid-template-columns: 1fr;
+				row-gap: 45px;
 			}
 
-			/* keep the diagram legible: let it scroll sideways */
-			.workflow {
-				overflow-x: auto;
+			.statement {
+				font-size: 18px;
 			}
 
-			.workflow img {
-				width: 900px;
-				max-width: none;
+			.side-note {
+				display: none;
 			}
 		}
 	</style>
@@ -322,11 +329,15 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 			ASKEW
 		</a>
 
-		<span class="cross red logo-cross"></span>
+		<span
+			class="cross red logo-cross"
+		></span>
 
 		<div class="left-line"></div>
 
-		<span class="cross blue bottom-cross"></span>
+		<span
+			class="cross blue bottom-cross"
+		></span>
 
 
 
@@ -342,8 +353,11 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 				PROJECTS
 			</a>
 
-			<a href={`${base}contact/`}>
-				CONTACT
+			<a
+				href={`${base}about/`}
+				class="active"
+			>
+				ABOUT
 			</a>
 
 			<button
@@ -367,52 +381,81 @@ const base = import.meta.env.BASE_URL.endsWith("/")
 
 		<section class="about">
 
-			<div class="section-label">
+			<div class="about-label">
 				01 / ABOUT
 			</div>
 
-			<p class="intro">
-				We are a nonprofit architecture practice working with local
-				materials, craftspeople, and communities.
-			</p>
+
+			<div class="founder">
+
+
+				<!-- PHOTO -->
+
+				<figure class="photo">
+
+					<img
+						src={`${base}images/founder.jpg`}
+						width="1407"
+						height="1600"
+						decoding="async"
+						alt="Black-and-white photo of a person smiling from the open back of a converted ambulance strung with lights, with two people standing outside."
+					/>
+
+					<span
+						class="cross red photo-cross"
+					></span>
+
+				</figure>
+
+
+
+				<!-- FOUNDER STATEMENT -->
+
+				<div>
+
+					<span class="block-number">
+						02 / FOUNDER
+					</span>
+
+					<p class="statement">
+						As the founder of Askew, I am interested
+						in exploring alternative ways of living
+						that foster deeper connections to nature,
+						community, and creativity. Years spent
+						embracing a nomadic, nature-oriented
+						lifestyle have shaped my belief that life
+						can exist beyond the productivity-driven
+						structures of cities. Through Askew, I hope
+						to make space for different ways of living
+						by creating architecture that is accessible,
+						affordable, and rooted in a more meaningful
+						relationship with the natural world.
+					</p>
+
+				</div>
+
+
+			</div>
 
 
 
 			<!-- drafting divider -->
 
 			<div class="divider">
-				<span class="cross red divider-cross"></span>
+
+				<span
+					class="cross red divider-cross"
+				></span>
+
 			</div>
-
-
-
-			<!-- HOW WE WORK -->
-
-			<div class="section-label">
-				02 / HOW WE WORK
-			</div>
-
-			<figure class="workflow">
-				<img
-					src={`${base}images/askew-workflow.png`}
-					width="1536"
-					height="1024"
-					loading="lazy"
-					decoding="async"
-					alt="Askew workflow diagram. Four core roles — Designer / Architect (design, permits), Programs / Relations (funding, workshops, partners), Operations (budget, contracts, logistics) and Site Manager (construction, fabrication) — are linked in a loop. Clients, a visiting researcher / designer and interns feed into them, with consultants, funders and contractors connecting from outside."
-				/>
-			</figure>
-
-			<ol class="steps">
-				<li>OPPORTUNITY</li>
-				<li>RESEARCH</li>
-				<li>SOURCE</li>
-				<li>DESIGN</li>
-				<li>BUILD</li>
-				<li>SHARE</li>
-			</ol>
 
 		</section>
+
+
+		<div class="side-note">
+			NATURE / COMMUNITY / CREATIVITY
+		</div>
+
 
 	</main>
 
